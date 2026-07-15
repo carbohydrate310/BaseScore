@@ -1,0 +1,464 @@
+/* モダンスポーツデザインテーマ（ダーク＆ネオングリーン） */
+:root {
+    --bg-main: #0f172a;
+    --bg-card: #1e293b;
+    --bg-input: #334155;
+    --primary: #10b981;
+    --primary-hover: #059669;
+    --accent: #3b82f6;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: #475569;
+    --danger: #ef4444;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+/* ヘッダー */
+.app-header {
+    background-color: var(--bg-card);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5%;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--primary);
+}
+
+.nav-bar {
+    display: flex;
+    gap: 10px;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.nav-btn:hover, .nav-btn.active {
+    background-color: var(--bg-input);
+    color: var(--text-main);
+}
+
+/* コンテナ */
+.container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+/* タブコンテンツ */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* カレンダーヒーローエリア */
+.calendar-hero {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.today-badge {
+    background-color: var(--primary);
+    color: #000;
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: var(--text-muted);
+}
+
+/* 試合リスト・カード */
+.section-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.info-tip {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: normal;
+}
+
+.game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.game-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+    position: relative;
+}
+
+.game-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary);
+}
+
+.card-date {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    display: block;
+}
+
+.card-teams {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.card-versus {
+    color: var(--primary);
+    font-size: 0.9rem;
+}
+
+.delete-game-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+/* 試合編成フォーム */
+.modern-form {
+    background-color: var(--bg-card);
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 20px;
+}
+
+.vs-text {
+    font-weight: bold;
+    color: var(--primary);
+    text-align: center;
+    margin-top: 15px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+input[type="text"], input[type="date"], select {
+    width: 100%;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: #000;
+    font-weight: bold;
+    border: none;
+    padding: 14px;
+    border-radius: 6px;
+    width: 100%;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+/* 試合管理＆セットアップ */
+.match-hero {
+    background-color: var(--bg-card);
+    text-align: center;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    border-left: 5px solid var(--primary);
+}
+
+.match-up {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.vs-badge {
+    background-color: var(--primary);
+    color: #000;
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.step-container {
+    background-color: var(--bg-card);
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.step-num {
+    background-color: var(--accent);
+    padding: 3px 10px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.member-setup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.team-setup-card {
+    background-color: var(--bg-main);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.team-setup-card h4 {
+    margin-bottom: 15px;
+    color: var(--primary);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 5px;
+}
+
+.batting-order-list .order-row {
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.order-num {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.order-row input {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+}
+
+.bench-setup-card {
+    background-color: var(--bg-main);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-bottom: 25px;
+}
+
+.back-bar {
+    margin-bottom: 15px;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* 打席入力画面 */
+.active-batter-card {
+    background: radial-gradient(circle at top right, #1e293b, #0f172a);
+    padding: 30px;
+    border-radius: 12px;
+    border: 2px solid var(--accent);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.now-at-bat-label {
+    font-weight: bold;
+    color: var(--accent);
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.batter-focus-flex {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+#current-batter-name {
+    font-size: 2.2rem;
+    font-weight: 800;
+}
+
+.result-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 600px) {
+    .result-buttons {
+        grid-template-columns: 1fr 1fr;
+    }
+    .member-setup-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.btn-result {
+    padding: 15px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+    transition: transform 0.1s;
+}
+
+.btn-result:active {
+    transform: scale(0.95);
+}
+
+.btn-result.hit { background-color: #059669; }
+.btn-result.homerun { background-color: #d97706; }
+.btn-result.walk { background-color: #2563eb; }
+.btn-result.out { background-color: #4b5563; }
+
+/* スタッツセクション */
+.stats-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.stats-tab-btn {
+    background-color: var(--bg-input);
+    border: none;
+    color: var(--text-muted);
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.stats-tab-btn.active {
+    background-color: var(--primary);
+    color: black;
+}
+
+.stats-pane {
+    display: none;
+}
+
+.stats-pane.active {
+    display: block;
+}
+
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.stats-table th, .stats-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.stats-table th {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
