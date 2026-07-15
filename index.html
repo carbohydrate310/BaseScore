@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BaseScore - 次世代野球スコアボーダー</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="logo">⚾ BaseScore</div>
+        <nav class="nav-bar">
+            <button class="nav-btn active" onclick="switchTab('home')">ホーム / カレンダー</button>
+            <button class="nav-btn" onclick="switchTab('add-game')">試合追加</button>
+        </nav>
+    </header>
+
+    <main class="container">
+        
+        <section id="home" class="tab-content active">
+            <div class="calendar-hero">
+                <div class="today-badge">TODAY</div>
+                <h2 id="current-date">2026年--月--日</h2>
+                <p class="subtitle">本日の試合日程および結果一覧</p>
+            </div>
+
+            <div class="section-title">試合一覧 <span class="info-tip">※クリックすると試合管理・スコア入力へ進みます</span></div>
+            <div id="game-list" class="game-grid">
+                </div>
+        </section>
+
+        <section id="add-game" class="tab-content">
+            <div class="card-header">
+                <h2>新規試合の編成</h2>
+                <p>日付と対戦カードを入力して、新しいマッチを作成します。</p>
+            </div>
+            <form id="game-form" class="modern-form">
+                <div class="form-group">
+                    <label>試合日程</label>
+                    <input type="date" id="game-date" required>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>先攻 (ビジター)</label>
+                        <input type="text" id="away-team" placeholder="チーム名を入力" required>
+                    </div>
+                    <div class="vs-text">VS</div>
+                    <div class="form-group">
+                        <label>後攻 (ホーム)</label>
+                        <input type="text" id="home-team" placeholder="チーム名を入力" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">マッチメイク完了</button>
+            </form>
+        </section>
+
+        <section id="game-manager" class="tab-content">
+            <div class="back-bar">
+                <button class="btn-text" onclick="switchTab('home')">← ホームへ戻る</button>
+            </div>
+            
+            <div class="match-hero">
+                <span id="manage-game-date" class="match-date"></span>
+                <div class="match-up">
+                    <span id="manage-away" class="team-name"></span>
+                    <span class="vs-badge">VS</span>
+                    <span id="manage-home" class="team-name"></span>
+                </div>
+            </div>
+
+            <div class="step-container">
+                <div class="step-header">
+                    <span class="step-num">STEP 1</span>
+                    <h3>スターティングメンバー & 控え登録</h3>
+                </div>
+                
+                <div class="member-setup-grid">
+                    <div class="team-setup-card">
+                        <h4 id="setup-away-title">先攻</h4>
+                        <div class="form-group">
+                            <label>先発投手</label>
+                            <input type="text" id="member-away-pitcher" value="ピッチャーA">
+                        </div>
+                        <div class="batting-order-list" id="away-batting-inputs">
+                            </div>
+                    </div>
+
+                    <div class="team-setup-card">
+                        <h4 id="setup-home-title">後攻</h4>
+                        <div class="form-group">
+                            <label>先発投手</label>
+                            <input type="text" id="member-home-pitcher" value="ピッチャーB">
+                        </div>
+                        <div class="batting-order-list" id="home-batting-inputs">
+                            </div>
+                    </div>
+                </div>
+
+                <div class="bench-setup-card">
+                    <h4>ベンチ入りメンバー（カンマ区切り）</h4>
+                    <input type="text" id="bench-members" placeholder="選手A, 選手B, 選手C...">
+                </div>
+
+                <button class="btn-primary" onclick="proceedToScoreInput()">メンバーを決定してスコア入力へ進む</button>
+            </div>
+        </section>
+
+        <section id="score-input-section" class="tab-content">
+            <div class="back-bar">
+                <button class="btn-text" onclick="backToManager()">← メンバー修正に戻る</button>
+            </div>
+
+            <div class="step-container">
+                <div class="step-header">
+                    <span class="step-num">STEP 2</span>
+                    <h3>打席結果のリアルタイム入力</h3>
+                </div>
+
+                <div class="active-batter-card">
+                    <div class="now-at-bat-label">NOW AT BAT</div>
+                    <div class="batter-focus-flex">
+                        <div class="batter-info">
+                            <span id="current-batter-team" class="badge"></span>
+                            <h2 id="current-batter-name">打者名</h2>
+                            <p id="current-batter-order">1番打者</p>
+                        </div>
+                        <div class="vs-pitcher-info">
+                            <span>対戦投手:</span>
+                            <strong id="current-opponent-pitcher">投手名</strong>
+                        </div>
+                    </div>
+
+                    <div class="result-buttons">
+                        <button class="btn-result hit" onclick="recordAtBat('single')">単打 (1塁打)</button>
+                        <button class="btn-result hit" onclick="recordAtBat('double')">二塁打</button>
+                        <button class="btn-result hit" onclick="recordAtBat('triple')">三塁打</button>
+                        <button class="btn-result homerun" onclick="recordAtBat('hr')">本塁打</button>
+                        <button class="btn-result walk" onclick="recordAtBat('walk')">四死球</button>
+                        <button class="btn-result out" onclick="recordAtBat('strikeout')">三振</button>
+                        <button class="btn-result out" onclick="recordAtBat('out')">凡退 (ゴロ/飛球)</button>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <h3>📊 本日の試合個人スタッツ</h3>
+                    
+                    <div class="stats-tabs">
+                        <button class="stats-tab-btn active" onclick="switchStatsTab('stats-away')">先攻打撃成績</button>
+                        <button class="stats-tab-btn" onclick="switchStatsTab('stats-home')">後攻打撃成績</button>
+                    </div>
+
+                    <div id="stats-away" class="stats-pane active">
+                        <table class="stats-table">
+                            <thead>
+                                <tr><th>打順</th><th>選手名</th><th>打数</th><th>安打</th><th>本塁打</th><th>四球</th><th>打率</th></tr>
+                            </thead>
+                            <tbody id="away-stats-body"></tbody>
+                        </table>
+                    </div>
+
+                    <div id="stats-home" class="stats-pane">
+                        <table class="stats-table">
+                            <thead>
+                                <tr><th>打順</th><th>選手名</th><th>打数</th><th>安打</th><th>本塁打</th><th>四球</th><th>打率</th></tr>
+                            </thead>
+                            <tbody id="home-stats-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
