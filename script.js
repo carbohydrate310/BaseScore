@@ -1,20 +1,21 @@
 // アプリデータ管理
-let games = JSON.parse(localStorage.getItem('baseball_games_v4')) || [];
+let games = JSON.parse(localStorage.getItem('baseball_games_v5')) || [];
+let playerRoster = JSON.parse(localStorage.getItem('baseball_roster_v5')) || [
+    "山田", "鈴木", "佐藤", "田中", "高橋", "渡辺", "伊藤", "山本", "中村", "小林"
+]; // デフォルトの選手リスト
 let activeGameId = null;
 
 // 試合内の動的イニング・カウント・走者ステート
-let currentInning = 1;      // 1〜9回
-let isTopInning = true;     // true:表(先攻攻撃), false:裏(後攻攻撃)
+let currentInning = 1;
+let isTopInning = true;
 let currentBatterIndex = { away: 0, home: 0 };
 
-let countS = 0; // ストライク (0~2)
-let countB = 0; // ボール (0~3)
-let countO = 0; // アウト (0~2)
+let countS = 0;
+let countB = 0;
+let countO = 0;
 
-// 各塁の走者状態 (0: 走者なし, 1: 走者あり)
 let bases = { first: 0, second: 0, third: 0 };
 
-// 各回のイニング得点データ
 let inningsScore = {
     away: [null, null, null, null, null, null, null, null, null],
     home: [null, null, null, null, null, null, null, null, null]
@@ -23,7 +24,7 @@ let inningsScore = {
 document.addEventListener('DOMContentLoaded', () => {
     updateDate();
     renderGames();
-    generateBattingOrderInputs();
+    renderRoster();
 });
 
 function updateDate() {
@@ -37,8 +38,53 @@ function switchTab(tabId) {
     document.getElementById(tabId).classList.add('active');
     
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    
+    // ナビゲーションの「アクティブ切り替え」を正確に処理
     const matchedBtn = Array.from(document.querySelectorAll('.nav-btn')).find(btn => btn.getAttribute('onclick').includes(tabId));
     if (matchedBtn) matchedBtn.classList.add('active');
+}
+
+// 選手名簿の管理
+function renderRoster() {
+    const listContainer = document.getElementById('roster-list');
+    listContainer.innerHTML = '';
+    playerRoster.forEach((player, idx) => {
+        listContainer.innerHTML += `
+            <li class="roster-li">
+                <span>${player}</span>
+                <button class="remove-player-btn" onclick="removePlayerFromRoster(${idx})">×</button>
+            </li>
+        `;
+    });
+    localStorage.setItem('baseball_roster_v5', JSON.stringify(playerRoster));
+}
+
+function addPlayerToRoster() {
+    const nameInput = document.getElementById('new-player-name');
+    const name = nameInput.value.trim();
+    if (name) {
+        playerRoster.push(name);
+        nameInput.value = '';
+        renderRoster();
+    }
+}
+
+function removePlayerFromRoster(idx) {
+    playerRoster.splice(idx, 1);
+    renderRoster();
+}
+
+// メンバー設定セレクトボックスの生成
+function populateRosterSelects() {
+    const selects = document.querySelectorAll('.roster-select');
+    selects.forEach(select => {
+        const prevValue = select.value;
+        select.innerHTML = '<option value="">-- 選択 --</option>';
+        playerRoster.forEach(player => {
+            select.innerHTML += `<option value="${player}">${player}</option>`;
+        });
+        if (prevValue) select.value = prevValue;
+    });
 }
 
 // 試合の追加
@@ -51,14 +97,16 @@ document.getElementById('game-form').addEventListener('submit', (e) => {
     const newGame = {
         id: Date.now(),
         date, home, away,
-        homePitcher: 'ピッチャーB',
-        awayPitcher: 'ピッチャーA',
-        // 進化した打撃記録スタッツ
-        awayLineup: Array.from({length: 9}, (_, i) => ({ name: `先攻打者${i+1}`, plateApps: 0, atBats: 0, hits: 0, double: 0, triple: 0, hrs: 0, bb: 0 })),
-        homeLineup: Array.from({length: 9}, (_, i) => ({ name: `後攻打者${i+1}`, plateApps: 0, atBats: 0, hits: 0, double: 0, triple: 0, hrs: 0, bb: 0 })),
+        homePitcher: '',
+        awayPitcher: '',
+        awayLineup: Array.from({length: 9}, (_, i) => ({ name: '', plateApps: 0, atBats: 0, hits: 0, double: 0, triple: 0, hrs: 0, bb: 0 })),
+        homeLineup: Array.from({length: 9}, (_, i) => ({ name: '', plateApps: 0, atBats: 0, hits: 0, double: 0, triple: 0, hrs: 0, bb: 0 })),
         bench: "",
         scoreAwayHits: 0,
-        scoreHomeHits: 0
+        scoreHomeHits: 0,
+        scoreAway: 0,  // 最終的な決着スコア
+        scoreHome: 0,  // 最終的な決着スコア
+        isFinished: false // 終了判定
     };
 
     games.push(newGame);
@@ -68,6 +116,7 @@ document.getElementById('game-form').addEventListener('submit', (e) => {
     switchTab('home');
 });
 
+// 【NEW】試合結果スコアを反映したゲームリストレンダリング
 function renderGames() {
     const gameListContainer = document.getElementById('game-list');
     if (games.length === 0) {
@@ -78,15 +127,26 @@ function renderGames() {
     games.forEach(game => {
         const gameCard = document.createElement('div');
         gameCard.className = 'game-card';
+        
+        let scoreUI = `<span class="card-versus">VS</span>`;
+        let statusBadge = `<span class="game-status-label live">試合前/LIVE</span>`;
+
+        // 試合終了している場合のみ、スコアを大きく表示
+        if (game.isFinished) {
+            scoreUI = `<span class="score-badge">${game.scoreAway} - ${game.scoreHome}</span>`;
+            statusBadge = `<span class="game-status-label finished">GAME SET</span>`;
+        }
+
         gameCard.innerHTML = `
             <button class="delete-game-btn" onclick="event.stopPropagation(); deleteGame(${game.id})">削除</button>
             <div onclick="openGameManager(${game.id})">
                 <span class="card-date">${game.date}</span>
                 <div class="card-teams">
                     <span>${game.away}</span>
-                    <span class="card-versus">VS</span>
+                    ${scoreUI}
                     <span>${game.home}</span>
                 </div>
+                ${statusBadge}
             </div>
         `;
         gameListContainer.appendChild(gameCard);
@@ -99,6 +159,7 @@ function deleteGame(id) {
     renderGames();
 }
 
+// メンバー入力欄（セレクトボックス型）の動的生成
 function generateBattingOrderInputs() {
     const awayContainer = document.getElementById('away-batting-inputs');
     const homeContainer = document.getElementById('home-batting-inputs');
@@ -106,8 +167,16 @@ function generateBattingOrderInputs() {
     homeContainer.innerHTML = '';
 
     for (let i = 1; i <= 9; i++) {
-        awayContainer.innerHTML += `<div class="order-row"><span class="order-num">${i}番</span><input type="text" id="away-b-${i}" placeholder="打者${i}"></div>`;
-        homeContainer.innerHTML += `<div class="order-row"><span class="order-num">${i}番</span><input type="text" id="home-b-${i}" placeholder="打者${i}"></div>`;
+        awayContainer.innerHTML += `
+            <div class="order-row">
+                <span class="order-num">${i}番</span>
+                <select id="away-b-${i}" class="roster-select"></select>
+            </div>`;
+        homeContainer.innerHTML += `
+            <div class="order-row">
+                <span class="order-num">${i}番</span>
+                <select id="home-b-${i}" class="roster-select"></select>
+            </div>`;
     }
 }
 
@@ -121,35 +190,40 @@ function openGameManager(gameId) {
     document.getElementById('setup-away-title').innerText = `先攻: ${game.away}`;
     document.getElementById('setup-home-title').innerText = `後攻: ${game.home}`;
 
+    // 入力欄を生成し、名簿プルダウンを注入
+    generateBattingOrderInputs();
+    populateRosterSelects();
+
+    // 既存データがあればセット
     document.getElementById('member-away-pitcher').value = game.awayPitcher;
     document.getElementById('member-home-pitcher').value = game.homePitcher;
     document.getElementById('bench-members').value = game.bench || '';
 
     for (let i = 1; i <= 9; i++) {
-        document.getElementById(`away-b-${i}`).value = game.awayLineup[i-1].name;
-        document.getElementById(`home-b-${i}`).value = game.homeLineup[i-1].name;
+        const valAway = game.awayLineup[i-1].name || playerRoster[i-1] || '';
+        const valHome = game.homeLineup[i-1].name || playerRoster[i] || '';
+        document.getElementById(`away-b-${i}`).value = valAway;
+        document.getElementById(`home-b-${i}`).value = valHome;
     }
     switchTab('game-manager');
 }
 
-// メンバー決定・スコア画面初期化
+// メンバー決定
 function proceedToScoreInput() {
     const game = games.find(g => g.id === activeGameId);
-    game.awayPitcher = document.getElementById('member-away-pitcher').value;
-    game.homePitcher = document.getElementById('member-home-pitcher').value;
+    game.awayPitcher = document.getElementById('member-away-pitcher').value || 'ピッチャーA';
+    game.homePitcher = document.getElementById('member-home-pitcher').value || 'ピッチャーB';
     game.bench = document.getElementById('bench-members').value;
 
     for (let i = 1; i <= 9; i++) {
-        game.awayLineup[i-1].name = document.getElementById(`away-b-${i}`).value;
-        game.homeLineup[i-1].name = document.getElementById(`home-b-${i}`).value;
+        game.awayLineup[i-1].name = document.getElementById(`away-b-${i}`).value || `打者${i}`;
+        game.homeLineup[i-1].name = document.getElementById(`home-b-${i}`).value || `打者${i}`;
     }
     saveData();
 
-    // スコアボードテキスト同期
     document.getElementById('sb-away-name').innerText = game.away;
     document.getElementById('sb-home-name').innerText = game.home;
 
-    // ゲーム内状況のリセット
     currentInning = 1;
     isTopInning = true;
     currentBatterIndex = { away: 0, home: 0 };
@@ -169,7 +243,7 @@ function proceedToScoreInput() {
 
 function backToManager() { switchTab('game-manager'); }
 
-// イニングボードおよび得点表示の更新
+// イニングボードおよび得点表示
 function updateScoreboardUI() {
     const game = games.find(g => g.id === activeGameId);
     const awayRow = document.getElementById('score-row-away').querySelectorAll('td');
@@ -192,6 +266,10 @@ function updateScoreboardUI() {
     document.getElementById('sb-home-r').innerText = totalHome;
     document.getElementById('sb-away-h').innerText = game.scoreAwayHits;
     document.getElementById('sb-home-h').innerText = game.scoreHomeHits;
+
+    // ゲーム内進捗をゲームデータオブジェクトにも記憶
+    game.scoreAway = totalAway;
+    game.scoreHome = totalHome;
 }
 
 // 走者・SBO状況表示の更新
@@ -260,8 +338,6 @@ function recordAtBat(resultType) {
     const batter = lineup[idx];
 
     let runsScored = 0;
-
-    // 打席数を加算
     batter.plateApps += 1;
 
     if (resultType === 'strikeout' || resultType === 'out') {
@@ -361,25 +437,24 @@ function changeInning() {
     updateScoreInputUI();
 }
 
-// ５．試合終了＆スタッツ最終集計レポート
+// 試合終了＆スタッツ最終集計レポート
 function finishGame() {
     if (!confirm('試合を終了し、スタッツレポートを生成しますか？')) return;
 
     const game = games.find(g => g.id === activeGameId);
-    
-    // スコアボードの複製コピー
+    game.isFinished = true; // 終了フラグをONにする
+
+    // スコアボードの複製
     const currentScoreHtml = document.querySelector('.scoreboard-container').innerHTML;
     document.getElementById('report-scoreboard-container').innerHTML = currentScoreHtml;
 
     // MVP、本塁打王の集計
     const allPlayers = [...game.awayLineup, ...game.homeLineup];
     
-    // MVP (最多安打者)
+    // MVP
     let mvp = { name: 'なし', hits: 0 };
     allPlayers.forEach(p => {
-        if (p.hits > mvp.hits) {
-            mvp = { name: p.name, hits: p.hits };
-        }
+        if (p.hits > mvp.hits) mvp = { name: p.name, hits: p.hits };
     });
     document.getElementById('mvp-winner').innerText = mvp.hits > 0 ? mvp.name : '該当者なし';
     document.getElementById('mvp-stats').innerText = mvp.hits > 0 ? `${mvp.hits} 安打` : '0安打';
@@ -387,9 +462,7 @@ function finishGame() {
     // 本塁打王
     let hrKing = { name: 'なし', hrs: 0 };
     allPlayers.forEach(p => {
-        if (p.hrs > hrKing.hrs) {
-            hrKing = { name: p.name, hrs: p.hrs };
-        }
+        if (p.hrs > hrKing.hrs) hrKing = { name: p.name, hrs: p.hrs };
     });
     document.getElementById('hr-winner').innerText = hrKing.hrs > 0 ? hrKing.name : '該当者なし';
     document.getElementById('hr-stats').innerText = hrKing.hrs > 0 ? `${hrKing.hrs} 本塁打` : '0本塁打';
@@ -401,9 +474,6 @@ function finishGame() {
         lineup.forEach((p, i) => {
             const avg = p.atBats > 0 ? (p.hits / p.atBats).toFixed(3) : '.000';
             const displayAvg = avg.startsWith('1') ? '1.000' : avg.substring(1);
-            
-            // 単打数 = 安打数 - (二塁打 + 三塁打 + 本塁打)
-            const singles = p.hits - (p.double + p.triple + p.hrs);
 
             tbody.innerHTML += `
                 <tr>
@@ -425,10 +495,11 @@ function finishGame() {
     renderReportTable(game.awayLineup, 'report-away-body');
     renderReportTable(game.homeLineup, 'report-home-body');
 
+    saveData();
+    renderGames(); // ホーム画面のリストを更新（ここが重要）
     switchTab('game-report-section');
 }
 
-// 簡易スタッツの描画
 function renderStats() {
     const game = games.find(g => g.id === activeGameId);
     
@@ -458,7 +529,6 @@ function renderStats() {
 }
 
 function switchStatsTab(paneId, event) {
-    // クリックされたタブが属するセクション内のコンテンツのみ切り替え
     const parent = event.target.closest('.tab-content, .report-details-card');
     parent.querySelectorAll('.stats-pane').forEach(p => p.classList.remove('active'));
     parent.querySelectorAll('.stats-tab-btn').forEach(b => b.classList.remove('active'));
@@ -468,5 +538,5 @@ function switchStatsTab(paneId, event) {
 }
 
 function saveData() {
-    localStorage.setItem('baseball_games_v4', JSON.stringify(games));
+    localStorage.setItem('baseball_games_v5', JSON.stringify(games));
 }
