@@ -1,22 +1,24 @@
-/* モダンスポーツデザインテーマ（ダーク＆ネオングリーン） */
 :root {
-    --bg-main: #0f172a;
-    --bg-card: #1e293b;
-    --bg-input: #334155;
+    --bg-main: #0b0f19;
+    --bg-card: #151f32;
+    --bg-input: #222f47;
     --primary: #10b981;
     --primary-hover: #059669;
     --accent: #3b82f6;
     --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --border: #475569;
-    --danger: #ef4444;
+    --text-muted: #64748b;
+    --border: #334155;
+    --danger: #f43f5e;
+    --strike: #eab308;
+    --ball: #3b82f6;
+    --out: #ef4444;
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', 'Hiragino Kaku Gothic ProN', sans-serif;
 }
 
 body {
@@ -67,14 +69,12 @@ body {
     color: var(--text-main);
 }
 
-/* コンテナ */
 .container {
     max-width: 1000px;
     margin: 30px auto;
     padding: 0 20px;
 }
 
-/* タブコンテンツ */
 .tab-content {
     display: none;
 }
@@ -89,9 +89,9 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* カレンダーヒーローエリア */
+/* カレンダーヒーロー */
 .calendar-hero {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    background: linear-gradient(135deg, #151f32 0%, #0b0f19 100%);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 30px;
@@ -114,7 +114,6 @@ body {
     color: var(--text-muted);
 }
 
-/* 試合リスト・カード */
 .section-title {
     font-size: 1.2rem;
     font-weight: bold;
@@ -179,99 +178,279 @@ body {
     font-size: 0.8rem;
 }
 
-/* 試合編成フォーム */
-.modern-form {
-    background-color: var(--bg-card);
-    padding: 30px;
+/* スコアボード */
+.scoreboard-container {
+    background-color: #0c121e;
+    border: 2px solid var(--border);
     border-radius: 12px;
-    border: 1px solid var(--border);
+    padding: 15px;
+    margin-bottom: 25px;
+    overflow-x: auto;
 }
 
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 20px;
-}
-
-.vs-text {
-    font-weight: bold;
-    color: var(--primary);
+.scoreboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Share Tech Mono', monospace;
     text-align: center;
-    margin-top: 15px;
 }
 
-.form-group {
-    margin-bottom: 20px;
+.scoreboard-table th, .scoreboard-table td {
+    padding: 10px;
+    font-size: 1.1rem;
+    border: 1px solid #1e293b;
+    min-width: 35px;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
+.scoreboard-table th {
     color: var(--text-muted);
+    font-size: 0.85rem;
 }
 
-input[type="text"], input[type="date"], select {
-    width: 100%;
-    background-color: var(--bg-input);
-    border: 1px solid var(--border);
-    color: var(--text-main);
-    padding: 12px;
-    border-radius: 6px;
-    font-size: 1rem;
-}
-
-input:focus {
-    outline: none;
-    border-color: var(--primary);
-}
-
-.btn-primary {
-    background-color: var(--primary);
-    color: #000;
+.scoreboard-table .team-cell {
+    text-align: left;
     font-weight: bold;
-    border: none;
-    padding: 14px;
-    border-radius: 6px;
-    width: 100%;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background 0.2s;
+    min-width: 120px;
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
 }
 
-.btn-primary:hover {
-    background-color: var(--primary-hover);
+.scoreboard-table .total-cell {
+    font-weight: bold;
+    color: var(--accent);
+    background-color: #111a2e;
 }
 
-/* 試合管理＆セットアップ */
-.match-hero {
+.scoreboard-table .total-cell.highlight {
+    color: var(--primary);
+    font-size: 1.3rem;
+}
+
+/* 状況パネル (ダイヤモンド & SBO) */
+.game-status-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
     background-color: var(--bg-card);
-    text-align: center;
-    padding: 25px;
+    border: 1px solid var(--border);
     border-radius: 12px;
-    margin-bottom: 30px;
-    border-left: 5px solid var(--primary);
+    padding: 25px;
+    margin-bottom: 25px;
 }
 
-.match-up {
+@media (max-width: 600px) {
+    .game-status-panel {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ダイヤモンドの表現 */
+.field-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
-    font-size: 1.5rem;
-    font-weight: bold;
+    background: radial-gradient(circle, #143a27 0%, #05140d 100%);
+    border-radius: 10px;
+    height: 180px;
+    position: relative;
+    border: 1px solid #115e3b;
 }
 
-.vs-badge {
+.diamond {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    transform: rotate(45deg);
+}
+
+.base {
+    width: 16px;
+    height: 16px;
+    background-color: #334155;
+    position: absolute;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    border: 1px solid #475569;
+}
+
+.base.active {
     background-color: var(--primary);
-    color: #000;
-    font-size: 0.8rem;
-    padding: 2px 8px;
-    border-radius: 4px;
+    box-shadow: 0 0 12px var(--primary);
 }
 
+.first { top: 0; right: 0; }
+.second { top: 0; left: 0; }
+.third { bottom: 0; left: 0; }
+
+.home-plate {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    background-color: white;
+    transform: rotate(45deg);
+}
+
+/* SBO */
+.sbo-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+}
+
+.inning-display {
+    font-size: 2rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-weight: bold;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+}
+
+.indicator-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.indicator-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: bold;
+    width: 20px;
+}
+
+.dots {
+    display: flex;
+    gap: 8px;
+}
+
+.dots span {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    display: inline-block;
+    transition: background-color 0.2s;
+}
+
+/* SBOランプの点灯色 */
+.indicator-row:nth-child(2) span.active { background-color: var(--strike); box-shadow: 0 0 8px var(--strike); }
+.indicator-row:nth-child(3) span.active { background-color: var(--ball); box-shadow: 0 0 8px var(--ball); }
+.indicator-row:nth-child(4) span.active { background-color: var(--out); box-shadow: 0 0 8px var(--out); }
+
+/* アクティブバッター */
+.active-batter-card {
+    background: radial-gradient(circle at top right, #1a2333, #0f172a);
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.now-at-bat-label {
+    font-weight: bold;
+    color: var(--accent);
+    letter-spacing: 2px;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+}
+
+.batter-focus-flex {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#current-batter-name {
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.badge {
+    background-color: var(--bg-input);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.result-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+@media (max-width: 600px) {
+    .result-buttons {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.btn-result {
+    padding: 12px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+}
+
+.btn-result.hit { background-color: #059669; }
+.btn-result.homerun { background-color: #d97706; }
+.btn-result.walk { background-color: #2563eb; }
+.btn-result.out { background-color: #4b5563; }
+
+/* 簡易カウント操作用サブボタン */
+.sub-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-sub {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.btn-sub:hover { background-color: #2d3d5a; }
+.btn-sub.reset-btn { color: var(--danger); }
+
+/* ヘッダー・アクションボタン */
+.back-bar-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.btn-gameset {
+    background-color: var(--danger);
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-gameset:hover {
+    background-color: #d90429;
+}
+
+/* メンバー設定 */
 .step-container {
     background-color: var(--bg-card);
     padding: 30px;
@@ -299,6 +478,12 @@ input:focus {
     grid-template-columns: 1fr 1fr;
     gap: 25px;
     margin-bottom: 25px;
+}
+
+@media (max-width: 600px) {
+    .member-setup-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .team-setup-card {
@@ -352,72 +537,63 @@ input:focus {
     font-weight: bold;
 }
 
-/* 打席入力画面 */
-.active-batter-card {
-    background: radial-gradient(circle at top right, #1e293b, #0f172a);
+/* フォーム関連 */
+.modern-form {
+    background-color: var(--bg-card);
     padding: 30px;
     border-radius: 12px;
-    border: 2px solid var(--accent);
-    text-align: center;
-    margin-bottom: 30px;
+    border: 1px solid var(--border);
 }
 
-.now-at-bat-label {
-    font-weight: bold;
-    color: var(--accent);
-    letter-spacing: 2px;
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-}
-
-.batter-focus-flex {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    margin-bottom: 25px;
-}
-
-#current-batter-name {
-    font-size: 2.2rem;
-    font-weight: 800;
-}
-
-.result-buttons {
+.form-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 20px;
 }
 
-@media (max-width: 600px) {
-    .result-buttons {
-        grid-template-columns: 1fr 1fr;
-    }
-    .member-setup-grid {
-        grid-template-columns: 1fr;
-    }
+.vs-text {
+    font-weight: bold;
+    color: var(--primary);
+    text-align: center;
+    margin-top: 15px;
 }
 
-.btn-result {
-    padding: 15px;
-    font-size: 0.95rem;
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+input[type="text"], input[type="date"] {
+    width: 100%;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: #0b0f19;
     font-weight: bold;
     border: none;
-    border-radius: 8px;
+    padding: 14px;
+    border-radius: 6px;
+    width: 100%;
     cursor: pointer;
-    color: white;
-    transition: transform 0.1s;
+    font-size: 1rem;
 }
 
-.btn-result:active {
-    transform: scale(0.95);
-}
-
-.btn-result.hit { background-color: #059669; }
-.btn-result.homerun { background-color: #d97706; }
-.btn-result.walk { background-color: #2563eb; }
-.btn-result.out { background-color: #4b5563; }
-
-/* スタッツセクション */
+/* スタッツ */
 .stats-tabs {
     display: flex;
     gap: 10px;
@@ -461,4 +637,73 @@ input:focus {
 .stats-table th {
     color: var(--text-muted);
     font-size: 0.85rem;
+}
+
+/* 【NEW】アワード（MVP）カード */
+.report-header {
+    margin-bottom: 30px;
+}
+
+.report-badge {
+    background-color: var(--danger);
+    color: white;
+    font-weight: bold;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.awards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 600px) {
+    .awards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.award-card {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+}
+
+.award-title {
+    color: #eab308;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.award-winner {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.award-stats {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.report-details-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 25px;
+}
+
+.report-details-card h3 {
+    margin-bottom: 20px;
 }
