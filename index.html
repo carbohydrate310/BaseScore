@@ -13,6 +13,7 @@
         <div class="logo">⚾ BaseScore Pro</div>
         <nav class="nav-bar">
             <button class="nav-btn active" onclick="switchTab('home')">ホーム / カレンダー</button>
+            <button class="nav-btn" onclick="switchTab('roster-tab')">選手名簿登録</button>
             <button class="nav-btn" onclick="switchTab('add-game')">試合追加</button>
         </nav>
     </header>
@@ -27,6 +28,29 @@
             </div>
             <div class="section-title">試合一覧 <span class="info-tip">※クリックして試合管理・スコア入力へ</span></div>
             <div id="game-list" class="game-grid"></div>
+        </section>
+
+        <section id="roster-tab" class="tab-content">
+            <div class="card-header">
+                <h2>👥 選手名簿マスター登録</h2>
+                <p>あらかじめチームの所属選手をここに登録しておくことで、試合ごとのオーダー作成時に選択肢から選ぶだけで入力できるようになります。</p>
+            </div>
+            <div class="roster-container">
+                <div class="modern-form">
+                    <div class="form-group">
+                        <label>新規選手名</label>
+                        <div class="input-with-button">
+                            <input type="text" id="new-player-name" placeholder="例: 山田 太郎">
+                            <button class="btn-primary-inline" onclick="addPlayerToRoster()">登録</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="roster-list-box">
+                    <h3>登録済み選手一覧</h3>
+                    <ul id="roster-list" class="roster-ul">
+                        </ul>
+                </div>
+            </div>
         </section>
 
         <section id="add-game" class="tab-content">
@@ -76,7 +100,7 @@
                         <h4 id="setup-away-title">先攻</h4>
                         <div class="form-group">
                             <label>先発投手</label>
-                            <input type="text" id="member-away-pitcher" value="ピッチャーA">
+                            <select id="member-away-pitcher" class="roster-select"></select>
                         </div>
                         <div class="batting-order-list" id="away-batting-inputs"></div>
                     </div>
@@ -84,7 +108,7 @@
                         <h4 id="setup-home-title">後攻</h4>
                         <div class="form-group">
                             <label>先発投手</label>
-                            <input type="text" id="member-home-pitcher" value="ピッチャーB">
+                            <select id="member-home-pitcher" class="roster-select"></select>
                         </div>
                         <div class="batting-order-list" id="home-batting-inputs"></div>
                     </div>
